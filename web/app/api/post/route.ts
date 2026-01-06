@@ -34,19 +34,34 @@ export async function POST(req: Request) {
     // Write markdown to temp file
     await fs.writeFile(tempFile, markdown, "utf-8");
 
-    // 0. Update Thread ID if provided
-    if (reqBody.lastThreadId) {
-      // We set day to 2 so next day is 3
-      const updateCommand = `python "${path.join(
-        scriptsDir,
-        "progress_tracker.py"
-      )}" update 2 "${reqBody.lastThreadId}"`;
-      try {
-        await execPromise(updateCommand, { cwd: rootDir });
-      } catch (e) {
-        console.error("Failed to update thread ID:", e);
-        // Continue anyway
+    // 0. Update Thread ID or Day if provided
+    try {
+      if (reqBody.day) {
+        // User wants the NEXT post to be this day.
+        // Script 'get_next_day' does current + 1.
+        // So we set current to (day - 1).
+        const dayArg = parseInt(reqBody.day) - 1;
+        const updateDayCommand = `python "${path.join(
+          scriptsDir,
+          "progress_tracker.py"
+        )}" set_day ${dayArg}`;
+        await execPromise(updateDayCommand, { cwd: rootDir });
       }
+
+      if (reqBody.lastThreadId) {
+        // Resetting thread ID. We assume this starts a new streak or fixes a broken one.
+        // If DAY was also provided above, we don't want to reset it to 2 here.
+        // So only reset day to 2 if DAY wasn't manually provided.
+        const dayArg = reqBody.day ? parseInt(reqBody.day) - 1 : 2;
+
+        const updateCommand = `python "${path.join(
+          scriptsDir,
+          "progress_tracker.py"
+        )}" update ${dayArg} "${reqBody.lastThreadId}"`;
+        await execPromise(updateCommand, { cwd: rootDir });
+      }
+    } catch (e) {
+      console.error("Failed to update progress:", e);
     }
 
     // 1. Create Gist

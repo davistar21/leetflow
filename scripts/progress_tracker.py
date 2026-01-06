@@ -48,6 +48,14 @@ if __name__ == "__main__":
         thread_id = sys.argv[3]
         save_progress(day, thread_id)
         print("Progress updated")
+    elif command == "set_day":
+        if len(sys.argv) < 3:
+            print("Usage: python progress_tracker.py set_day <day>")
+            sys.exit(1)
+        day = int(sys.argv[2])
+        current_thread_id = get_last_thread_id()
+        save_progress(day, current_thread_id)
+        print("Day updated")
     else:
         print(f"Unknown command: {command}")
         sys.exit(1)

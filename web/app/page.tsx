@@ -15,6 +15,7 @@ export default function Home() {
     language: "Python",
     code: "",
     image: "",
+    day: "",
   });
 
   const [lastThreadId, setLastThreadId] = useState("");
@@ -101,7 +102,8 @@ export default function Home() {
       const res = await axios.post("/api/post", {
         markdown,
         title: formData.title,
-        lastThreadId, // PASSING THIS NOW
+        lastThreadId,
+        day: formData.day,
       });
       if (res.data.success) {
         toast.success("Successfully published to X!", {
@@ -111,6 +113,7 @@ export default function Home() {
             onClick: () => window.open(res.data.gistUrl, "_blank"),
           },
         });
+        setLastThreadId("");
       } else if (res.data.warning) {
         toast.warning(res.data.warning, { id: toastId });
       }

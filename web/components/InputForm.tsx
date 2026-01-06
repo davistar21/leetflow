@@ -21,6 +21,7 @@ interface FormData {
   language: string;
   code: string;
   image: string;
+  day: string;
 }
 
 interface InputFormProps {
@@ -57,6 +58,17 @@ export function InputForm({
               value={formData.title}
               onChange={(e) => handleChange("title", e.target.value)}
               placeholder="e.g. Two Sum"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="day">Day Number (Optional)</Label>
+            <Input
+              id="day"
+              type="number"
+              value={formData.day}
+              onChange={(e) => handleChange("day", e.target.value)}
+              placeholder="Auto-increments if empty"
             />
           </div>
 
